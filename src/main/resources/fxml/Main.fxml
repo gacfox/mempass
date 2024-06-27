@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="480.0" prefWidth="640.0" stylesheets="@../css/Main.css" xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gacfox.mempass.controller.MainController">
+    <top>
+        <VBox prefHeight="41.0" prefWidth="361.0" BorderPane.alignment="CENTER">
+            <children>
+                <MenuBar>
+                    <menus>
+                        <Menu mnemonicParsing="false" text="文件">
+                            <items>
+                                <MenuItem mnemonicParsing="false" onAction="#handleExportDataSourceButton"
+                                          text="导出数据源"/>
+                                <MenuItem mnemonicParsing="false" onAction="#handleExportExcelButton" text="导出Excel"/>
+                                <MenuItem mnemonicParsing="false" onAction="#handleExitLoginButton" text="退出登录"/>
+                                <MenuItem mnemonicParsing="false" onAction="#handleExitProgramButton" text="退出程序"/>
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="编辑">
+                            <items>
+                                <MenuItem fx:id="miNewCategory" mnemonicParsing="false"
+                                          onAction="#handleNewCategoryButton" text="新建类别"/>
+                                <MenuItem fx:id="miNewAccount" mnemonicParsing="false"
+                                          onAction="#handleNewAccountButton" text="新建账户"/>
+                                <MenuItem fx:id="miUpdateCategory" disable="true" mnemonicParsing="false"
+                                          onAction="#handleUpdateCategoryButton" text="修改类别"/>
+                                <MenuItem fx:id="miUpdateAccount" disable="true" mnemonicParsing="false"
+                                          onAction="#handleUpdateAccountButton" text="修改账户"/>
+                                <MenuItem fx:id="miDeleteCategory" disable="true" mnemonicParsing="false"
+                                          onAction="#handleDeleteCategoryButton" text="删除类别"/>
+                                <MenuItem fx:id="miDeleteAccount" disable="true" mnemonicParsing="false"
+                                          onAction="#handleDeleteAccountButton" text="删除账户"/>
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="安全性">
+                            <items>
+                                <MenuItem mnemonicParsing="false" onAction="#handleChangePasswordButton"
+                                          text="修改密码"/>
+                                <MenuItem mnemonicParsing="false" onAction="#handleRandPasswordDialogButton"
+                                          text="随机密码"/>
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="帮助">
+                            <items>
+                                <MenuItem mnemonicParsing="false" onAction="#handleShowDocumentButton" text="使用文档"/>
+                                <MenuItem mnemonicParsing="false" onAction="#handleAboutDialogButton" text="关于"/>
+                            </items>
+                        </Menu>
+                    </menus>
+                </MenuBar>
+                <ToolBar>
+                    <items>
+                        <Button fx:id="btnNewCategory" mnemonicParsing="false" onAction="#handleNewCategoryButton"
+                                text="新建类别"/>
+                        <Button fx:id="btnNewAccount" mnemonicParsing="false" onAction="#handleNewAccountButton"
+                                text="新建账户"/>
+                        <Button fx:id="btnDeleteCategory" disable="true" mnemonicParsing="false"
+                                onAction="#handleDeleteCategoryButton" text="删除分类"/>
+                        <Button fx:id="btnDeleteAccount" disable="true" mnemonicParsing="false"
+                                onAction="#handleDeleteAccountButton" text="删除账户"/>
+                        <Button fx:id="btnRandomPassword" mnemonicParsing="false"
+                                onAction="#handleRandPasswordDialogButton" text="随机密码"/>
+                        <Button fx:id="btnExitLogin" mnemonicParsing="false" onAction="#handleExitLoginButton"
+                                text="锁定"/>
+                    </items>
+                </ToolBar>
+            </children>
+        </VBox>
+    </top>
+    <center>
+        <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <center>
+                <TableView fx:id="tvAccountInfo" editable="true" prefHeight="200.0" prefWidth="200.0"
+                           BorderPane.alignment="CENTER">
+                    <placeholder>
+                        <Label>暂无内容</Label>
+                    </placeholder>
+                    <columns>
+                        <TableColumn fx:id="tcAccountInfoKey" prefWidth="216.0" text="信息键">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="key"/>
+                            </cellValueFactory>
+                        </TableColumn>
+                        <TableColumn fx:id="tcAccountInfoValue" minWidth="0.0" prefWidth="223.0" text="信息值">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="value"/>
+                            </cellValueFactory>
+                        </TableColumn>
+                    </columns>
+                </TableView>
+            </center>
+            <bottom>
+                <Label BorderPane.alignment="CENTER_LEFT"/>
+            </bottom>
+            <left>
+                <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                    <top>
+                        <HBox alignment="CENTER" prefHeight="23.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                            <children>
+                                <TextField fx:id="tfSearch" alignment="CENTER" onAction="#handleSearchButton"
+                                           prefHeight="23.0" prefWidth="108.0"/>
+                                <Button mnemonicParsing="false" onAction="#handleClearSearchButton" text="清空">
+                                    <HBox.margin>
+                                        <Insets left="3.0"/>
+                                    </HBox.margin>
+                                </Button>
+                                <Button alignment="CENTER" mnemonicParsing="false" onAction="#handleSearchButton"
+                                        text="搜索">
+                                    <HBox.margin>
+                                        <Insets left="3.0"/>
+                                    </HBox.margin>
+                                </Button>
+                            </children>
+                            <BorderPane.margin>
+                                <Insets left="3.0" right="3.0" top="5.0"/>
+                            </BorderPane.margin>
+                        </HBox>
+                    </top>
+                    <center>
+                        <TreeView fx:id="tvCategory" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                            <BorderPane.margin>
+                                <Insets top="5.0"/>
+                            </BorderPane.margin>
+                        </TreeView>
+                    </center>
+                </BorderPane>
+            </left>
+        </BorderPane>
+    </center>
+</BorderPane>

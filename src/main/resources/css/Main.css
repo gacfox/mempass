@@ -1,0 +1,27 @@
+#btnNewCategory {
+    -fx-graphic: url("../images/btn-new-category.png")
+}
+
+#btnNewAccount {
+    -fx-graphic: url("../images/btn-new-account.png")
+}
+
+#btnDeleteCategory {
+    -fx-graphic: url("../images/btn-delete-category.png")
+}
+
+#btnDeleteAccount {
+    -fx-graphic: url("../images/btn-delete-account.png")
+}
+
+#btnRandomPassword {
+    -fx-graphic: url("../images/btn-random-password.png")
+}
+
+#btnExitLogin {
+    -fx-graphic: url("../images/btn-exit-login.png")
+}
+
+.table-cell {
+    -fx-font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, sans-serif;
+}
