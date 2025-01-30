@@ -1,48 +1,52 @@
-# Mempass
+# Mempass 密码管理器
 
-Mempass is a desktop password management tool developed with Java17 and JavaFX. It uses H2 embedded database and a symmetric key algorithm to encrypt and store data. Local data is stored in `~/appdata/roaming/mempass` on Windows, and in `~/.mempass` on Unix/Linux. These datas can be synced with OneDrive or other similar tools for backup and accessibility.
+Java17和JavaFX开发的密码管理器。
 
-## Features
+## 功能
 
-* Encrypted local storage
-* Organize account data with categories and tables
-* Random password generator
+* **数据加密存储**：使用加密的嵌入式H2数据库存储数据，密码部分使用`PBKDF2WithHmacSHA256`和`AES-128-CBC`加密存储。
+* **账号分类**：账号可以按分类管理。
+* **随机密码生成**：能够根据设定的规则生成密码。
+* **跨平台支持**：支持Windows、Linux和MacOS操作系统（未测试）。
 
-## Build
+## 同步数据
 
-To build the application, use the following command:
+Mempass没有内置的数据同步功能，但你可以直接使用OneDrive等工具同步H2数据库文件。由于数据库本身是加密的，这种同步将以端到端加密形式运行，这意味着在另一台电脑上你需要使用一致的密钥口令查看和管理数据。Windows下，数据存储目录位于`C:\Users\<用户名>\AppData\Roaming\mempass`，非Windows操作系统位于`~/mempass`目录，同步这个文件夹即可。
+
+## 构建项目
+
+拉取项目后，在根目录执行以下命令构建。
 
 ```bash
 gradle jpackageImage
 ```
 
-This command will create an executable application with an embedded Java environment using `jpackage`. There is no need to install Java on the target host.
+`jpackage`命令会生成包含运行时的可执行程序，运行程序的主机不必安装JDK。
 
+## 使用说明
 
-## Instructions
+### 登录
 
-### Login
-
-This application requires an authId and a master password to log in. The authId represents a database instance, and the master password is used as the HMAC encryption key to encrypt the database.
+Mempass密码管理器需要`认证ID`和`加密密钥`两个两个字段进行登录，`认证ID`同时代表一个账号数据库，`加密密钥`除了用于登录认证，还将通过PBE算法生成AES密钥用于加密数据。
 
 ![](doc/1.png)
 
-### Create new database
+### 创建数据库
 
-If there is no database instance for the authId, you must create a new database first.
+如果本机还没有任何账号数据库，运行程序会看到初始化对话框，在这里可以输入`认证ID`和`加密密钥`创建数据库。
 
 ![](doc/2.png)
 
-After the database is created, the user can login with the authId and the master password.
+数据库创建后，可以回到登录页面进行登录。
 
-### Managing Categories and Accounts
+### 管理分类和账号
 
-Click `New Category` to create a new category and `New Account` to create a new account. Categories and accounts will be displayed in the left tree view, and account details will be shown in the right table view.
+点击`新建类别`可以创建账号分类，默认有一个不可删除的`default`分类。点击`新建账户`可以创建账号和密码数据。分类和账号会在左侧的树形结构中展示，支持按账户项和备注信息搜索，账号的详细信息展示在右边的表格里。
 
 ![](doc/3.png)
 
-### Generating a Random Password
+### 生成随机密码
 
-Click `Random Password` to generate a random password with given rules.
+点击`随机密码`可以打开随机密码生成器，在这里可以生成符合指定规则的密码。
 
 ![](doc/4.png)
