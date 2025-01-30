@@ -2,16 +2,15 @@ package com.gacfox.mempass.util;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.security.Key;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
 import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.PBEParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  * 加密工具类
@@ -21,31 +20,29 @@ import javax.crypto.spec.PBEParameterSpec;
 @Slf4j
 public class EncUtil {
 
-    public static final int SALT_COUNT = 100;
     public static final byte[] SALT = new byte[]{2, 16, 123, 5, 87, 40, 31, 9};
-    public static final String ALGORITHM = "PBEWithMD5AndTripleDES";
+    public static final int ITERATIONS = 100;
+    public static final String ALGORITHM = "PBKDF2WithHmacSHA256";
 
     /**
-     * 根据密码获取秘钥
+     * 根据密码获取AES秘钥
      *
      * @param password 密码字符串
      * @return 秘钥
      */
-    private static Key toKey(String password) {
-        SecretKey key = null;
-        PBEKeySpec keySpec = new PBEKeySpec(password.toCharArray());
-        SecretKeyFactory factory;
+    private static Key toAesKey(String password) {
         try {
-            factory = SecretKeyFactory.getInstance(ALGORITHM);
-            key = factory.generateSecret(keySpec);
-        } catch (Exception e) {
-            log.error("加密密钥初始化失败: ", e);
+            PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), SALT, ITERATIONS, 128);
+            SecretKeyFactory factory = SecretKeyFactory.getInstance(ALGORITHM);
+            return new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+            log.error("获取密钥失败: ALGORITHM [" + ALGORITHM + "]");
+            throw new RuntimeException(e);
         }
-        return key;
     }
 
     /**
-     * PBE加密
+     * 加密
      *
      * @param str      明文
      * @param password 密码
@@ -58,7 +55,7 @@ public class EncUtil {
     }
 
     /**
-     * PBE解密
+     * 解密
      *
      * @param str      密文
      * @param password 密码
@@ -71,47 +68,72 @@ public class EncUtil {
     }
 
     /**
-     * PBE加密
+     * AES加密
      *
      * @param data     明文数据
      * @param password 密码
      * @return 密文数据
      */
     public static byte[] pbeEncrypt(byte[] data, String password) {
-        byte[] result = null;
-        Key key = toKey(password);
-        PBEParameterSpec parameterSpec = new PBEParameterSpec(SALT, SALT_COUNT);
-        Cipher cipher;
         try {
-            cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.ENCRYPT_MODE, key, parameterSpec);
-            result = cipher.doFinal(data);
+            // 密钥
+            Key key = toAesKey(password);
+
+            // 随机IV
+            SecureRandom secureRandom = new SecureRandom();
+            byte[] iv = new byte[16];
+            secureRandom.nextBytes(iv);
+
+            // 初始化加密器
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec);
+
+            // 加密
+            byte[] encryptedData = cipher.doFinal(data);
+
+            // 组合密文
+            byte[] combined = new byte[SALT.length + iv.length + encryptedData.length];
+            System.arraycopy(SALT, 0, combined, 0, SALT.length);
+            System.arraycopy(iv, 0, combined, SALT.length, iv.length);
+            System.arraycopy(encryptedData, 0, combined, SALT.length + iv.length, encryptedData.length);
+
+            return combined;
         } catch (Exception e) {
-            log.error("加密失败: ", e);
+            log.error("AES加密失败");
+            throw new RuntimeException(e);
         }
-        return result;
     }
 
     /**
-     * PBE解密
+     * AES解密
      *
      * @param data     密文数据
      * @param password 密码
      * @return 明文数据
      */
     public static byte[] pbeDecrypt(byte[] data, String password) {
-        byte[] result = null;
-        Key key = toKey(password);
-        PBEParameterSpec parameterSpec = new PBEParameterSpec(SALT, SALT_COUNT);
-        Cipher cipher;
         try {
-            cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.DECRYPT_MODE, key, parameterSpec);
-            result = cipher.doFinal(data);
+            // 密钥
+            Key key = toAesKey(password);
+
+            // 提取密文
+            byte[] iv = new byte[16];
+            System.arraycopy(data, SALT.length, iv, 0, iv.length);
+            byte[] encryptedData = new byte[data.length - SALT.length - iv.length];
+            System.arraycopy(data, SALT.length + iv.length, encryptedData, 0, encryptedData.length);
+
+            // 初始化解密器
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);
+
+            // 解密
+            return cipher.doFinal(encryptedData);
         } catch (Exception e) {
-            log.error("解密失败: ", e);
+            log.error("AES解密失败");
+            throw new RuntimeException(e);
         }
-        return result;
     }
 
     /**
@@ -143,8 +165,11 @@ public class EncUtil {
     public static String sha256Hex(String str) {
         String result = null;
         try {
+            byte[] strBytes = str.getBytes();
+            byte[] combined = new byte[strBytes.length + SALT.length];
+            System.arraycopy(strBytes, 0, combined, 0, strBytes.length);
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-            byte[] resultData = messageDigest.digest(str.getBytes());
+            byte[] resultData = messageDigest.digest(combined);
             result = encodeHex(resultData);
 
         } catch (NoSuchAlgorithmException e) {
