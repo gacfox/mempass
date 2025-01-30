@@ -111,6 +111,7 @@ public class AuthDao {
         } finally {
             DbUtil.closeResource(pstmt1, rs1);
             DbUtil.closeResource(pstmt2, rs2);
+            DbUtil.closeConnection();
         }
     }
 
@@ -131,6 +132,7 @@ public class AuthDao {
             log.error("数据库操作异常: ", e);
         } finally {
             DbUtil.closeResource(pstmt);
+            DbUtil.closeConnection();
         }
     }
 }

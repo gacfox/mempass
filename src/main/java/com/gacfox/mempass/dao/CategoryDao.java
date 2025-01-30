@@ -50,6 +50,7 @@ public class CategoryDao {
             log.error("数据库操作异常: ", e);
         } finally {
             DbUtil.closeResource(pstmt);
+            DbUtil.closeConnection();
         }
     }
 
@@ -71,6 +72,7 @@ public class CategoryDao {
             log.error("数据库操作异常: ", e);
         } finally {
             DbUtil.closeResource(pstmt);
+            DbUtil.closeConnection();
         }
     }
 
@@ -98,6 +100,7 @@ public class CategoryDao {
             log.error("数据库操作异常: ", e);
         } finally {
             DbUtil.closeResource(pstmt, rs);
+            DbUtil.closeConnection();
         }
         return result;
     }
@@ -125,6 +128,7 @@ public class CategoryDao {
             log.error("数据库操作异常: ", e);
         } finally {
             DbUtil.closeResource(pstmt, rs);
+            DbUtil.closeConnection();
         }
         return resultList;
     }
@@ -153,6 +157,7 @@ public class CategoryDao {
             log.error("数据库操作异常: ", e);
         } finally {
             DbUtil.closeResource(pstmt, rs);
+            DbUtil.closeConnection();
         }
         return category;
     }
@@ -164,31 +169,26 @@ public class CategoryDao {
      */
     public void deleteCategoryById(Long categoryId) {
         Connection conn = DbUtil.getConnection();
-
-        // 移动账户到默认分类
-        String sql1 = "update t_account set category_id=? where category_id=?";
         PreparedStatement pstmt1 = null;
+        PreparedStatement pstmt2 = null;
+        String sql1 = "update t_account set category_id=? where category_id=?";
+        String sql2 = "delete from t_category where category_id=?";
         try {
+            // 移动账户到默认分类
             pstmt1 = conn.prepareStatement(sql1);
             pstmt1.setLong(1, 1L);
             pstmt1.setLong(2, categoryId);
             pstmt1.execute();
-        } catch (SQLException e) {
-            log.error("数据库操作异常: ", e);
-        } finally {
-            DbUtil.closeResource(pstmt1);
-        }
-        // 删除分类
-        String sql2 = "delete from t_category where category_id=?";
-        PreparedStatement pstmt2 = null;
-        try {
+            // 删除分类
             pstmt2 = conn.prepareStatement(sql2);
             pstmt2.setLong(1, categoryId);
             pstmt2.execute();
         } catch (SQLException e) {
             log.error("数据库操作异常: ", e);
         } finally {
+            DbUtil.closeResource(pstmt1);
             DbUtil.closeResource(pstmt2);
+            DbUtil.closeConnection();
         }
     }
 }

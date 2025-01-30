@@ -66,6 +66,7 @@ public class AccountDao {
             log.error("数据库操作异常: ", e);
         } finally {
             DbUtil.closeResource(pstmt, rs);
+            DbUtil.closeConnection();
         }
         return account;
     }
@@ -99,6 +100,7 @@ public class AccountDao {
             log.error("数据库操作异常: ", e);
         } finally {
             DbUtil.closeResource(pstmt, rs);
+            DbUtil.closeConnection();
         }
         return resultList;
     }
@@ -135,6 +137,7 @@ public class AccountDao {
             log.error("数据库操作异常: ", e);
         } finally {
             DbUtil.closeResource(pstmt, rs);
+            DbUtil.closeConnection();
         }
         return resultList;
     }
@@ -164,6 +167,7 @@ public class AccountDao {
             log.error("数据库操作异常: ", e);
         } finally {
             DbUtil.closeResource(pstmt);
+            DbUtil.closeConnection();
         }
     }
 
@@ -194,6 +198,7 @@ public class AccountDao {
             log.error("数据库操作异常: ", e);
         } finally {
             DbUtil.closeResource(pstmt);
+            DbUtil.closeConnection();
         }
     }
 
@@ -214,6 +219,7 @@ public class AccountDao {
             log.error("数据库操作异常: ", e);
         } finally {
             DbUtil.closeResource(pstmt);
+            DbUtil.closeConnection();
         }
     }
 
@@ -244,6 +250,7 @@ public class AccountDao {
             log.error("数据库操作异常: ", e);
         } finally {
             DbUtil.closeResource(pstmt);
+            DbUtil.closeConnection();
         }
     }
 }
