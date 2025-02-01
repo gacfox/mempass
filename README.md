@@ -15,7 +15,7 @@ Mempass没有内置的数据同步功能，但你可以直接使用OneDrive等�
 
 ## 构建项目
 
-拉取项目后，在根目录执行以下命令构建。
+拉取项目后，在根目录执行以下命令构建`exe`可执行程序。
 
 ```bash
 gradle jpackageImage
