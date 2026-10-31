@@ -80,7 +80,15 @@ windeployqt --release build\windows-mingw-release\client\ui\mempass.exe
 
 ## Linux 同步服务端构建
 
-在服务器安装 Qt 6 开发包，要求系统至少包含 Core、Network、HttpServer、Sql，以及 SQLite 开发文件。
+在服务器安装 Qt 6 开发包（兼容 Qt 6.4 及以上），要求系统至少包含 Core、Network、HttpServer、WebSockets、Sql，以及 SQLite 开发文件。
+
+Ubuntu 24.04 示例：
+
+```bash
+sudo apt-get install -y build-essential cmake ninja-build \
+    qt6-base-dev qt6-httpserver-dev qt6-websockets-dev \
+    libsqlite3-dev libqt6sql6-sqlite
+```
 
 配置、构建服务端：
 

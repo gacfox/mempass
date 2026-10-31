@@ -4,7 +4,6 @@
 
 #include <QFile>
 #include <QHostAddress>
-#include <QHttpHeaders>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QSslCertificate>
@@ -83,8 +82,7 @@ SyncServer::SyncServer(Database *database, QString certPath, QString keyPath)
 
 bool SyncServer::authorize(const QHttpServerRequest &request, QString *error) const
 {
-    const QByteArray authorization =
-        request.headers().value(QHttpHeaders::WellKnownHeader::Authorization).toByteArray();
+    const QByteArray authorization = request.value(QByteArrayLiteral("Authorization"));
     if (!authorization.startsWith(QByteArrayLiteral("Bearer "))) {
         *error = QStringLiteral("缺少 Bearer 访问令牌");
         return false;
@@ -150,10 +148,7 @@ bool SyncServer::listen(const QString &host, quint16 port, QString *error)
                      .arg(server->errorString());
         return false;
     }
-    if (!httpServer_.bind(server.get())) {
-        *error = QStringLiteral("无法绑定 HTTP 服务到 %1:%2").arg(host).arg(port);
-        return false;
-    }
+    httpServer_.bind(server.get());
     tcpServer_ = std::move(server);
     return true;
 }

@@ -329,7 +329,7 @@ QString formatTimestamp(qint64 timestampMs)
     if (timestampMs <= 0) {
         return {};
     }
-    return QDateTime::fromMSecsSinceEpoch(timestampMs, QTimeZone::UTC)
+    return QDateTime::fromMSecsSinceEpoch(timestampMs, QTimeZone(QByteArrayLiteral("UTC")))
         .toLocalTime()
         .toString(QStringLiteral("yyyy-MM-dd HH:mm:ss"));
 }
