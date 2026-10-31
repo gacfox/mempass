@@ -2,6 +2,8 @@
 
 基于 C++ / Qt 6  的密码管理器工具，包含可独立运行的 Windows 客户端和可选的同步服务端。
 
+![截图](https://github.com/user-attachments/assets/66a134f4-115a-4202-b576-dc25a6f1d9cd)
+
 ## 特性
 
 - 端到端加密，主密码只用于本地解锁保险库。
