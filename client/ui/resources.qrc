@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="app.ico">app.ico</file>
+        <file>icons/category_add.png</file>
+        <file>icons/delete.png</file>
+        <file>icons/keyboard.png</file>
+        <file>icons/lock.png</file>
+        <file>icons/sync.png</file>
+        <file>icons/user_add.png</file>
+        <file>icons/gear.png</file>
+        <file>icons/information.png</file>
+        <file>icons/keyboard_magnify.png</file>
+    </qresource>
+</RCC>

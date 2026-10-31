@@ -1,14 +1,33 @@
-# for eclipse
-.settings
-target
-.classpath
-.project
+# Build outputs
+build/
+out/
+cmake-build-*/
 
-# for gradle
-.gradle
-bin
-build
+# vcpkg
+vcpkg_installed/
+vcpkg-manifest-install.log
 
-# for intellij idea
-.idea
-*.iml
+# IDE
+.idea/
+.vs/
+.vscode/
+*.user
+*.autosave
+.qtcreator
+
+# CMake
+CMakeUserPresets.json
+
+# Qt
+*.qm
+*.qmlc
+
+# Runtime data
+*.db
+*.db-shm
+*.db-wal
+*.bak
+
+# OS
+Thumbs.db
+Desktop.ini
