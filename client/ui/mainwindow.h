@@ -6,6 +6,7 @@
 
 class QLabel;
 class QThread;
+class QToolButton;
 
 namespace mempass {
 class SyncService;
@@ -60,6 +61,12 @@ private:
     void loadAccountDetails(const mempass::Account &account);
     void setupPasswordCell();
     void clearPasswordCell();
+    QWidget *buildValueCell(const QString &text,
+                            const QString &labelObjectName,
+                            QLabel **labelOut,
+                            QToolButton **buttonOut);
+    void setupCopyCells(const mempass::Account &account);
+    void clearCopyCells();
     void copyCurrentPassword();
     void clearDetails();
     void configureAutoSync();
@@ -76,4 +83,8 @@ private:
     QString m_currentPassword;
     QLabel *m_passwordValueLabel = nullptr;
     int m_passwordRow = -1;
+
+    static constexpr int kUsernameRow = 1;
+    static constexpr int kDescriptionRow = 3;
+    static constexpr int kNoteRow = 4;
 };

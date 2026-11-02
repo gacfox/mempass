@@ -438,6 +438,7 @@ void MainWindow::loadAccountDetails(const Account &account)
         return;
     }
     clearPasswordCell();
+    clearCopyCells();
 
     m_currentAccountId = account.id;
     m_currentPassword = account.password;
@@ -455,10 +456,10 @@ void MainWindow::loadAccountDetails(const Account &account)
     };
     const QStringList values = {
         account.itemName,
-        account.username,
         QString(),
-        account.description,
-        account.note,
+        QString(),
+        QString(),
+        QString(),
         formatTimestamp(account.createdAtMs),
         formatTimestamp(account.updatedAtMs),
         statusText(account.status),
@@ -475,6 +476,7 @@ void MainWindow::loadAccountDetails(const Account &account)
         ui->tableDetails->setItem(row, 1, valueItem);
     }
     setupPasswordCell();
+    setupCopyCells(account);
     ui->tableDetails->clearSelection();
 }
 
@@ -497,27 +499,96 @@ void MainWindow::setupPasswordCell()
         return;
     }
 
+    QToolButton *copyButton = nullptr;
+    QWidget *container = buildValueCell(QStringLiteral("••••••••"),
+                                        QStringLiteral("passwordValueLabel"),
+                                        &m_passwordValueLabel,
+                                        &copyButton);
+    connect(copyButton, &QToolButton::clicked, this, &MainWindow::copyCurrentPassword);
+
+    ui->tableDetails->setCellWidget(m_passwordRow, 1, container);
+    ui->tableDetails->resizeRowToContents(m_passwordRow);
+}
+
+QWidget *MainWindow::buildValueCell(const QString &text,
+                                    const QString &labelObjectName,
+                                    QLabel **labelOut,
+                                    QToolButton **buttonOut)
+{
     QWidget *container = new QWidget(ui->tableDetails);
     QHBoxLayout *layout = new QHBoxLayout(container);
     layout->setContentsMargins(4, 2, 4, 2);
     layout->setSpacing(6);
 
-    QLabel *maskedLabel = new QLabel(QStringLiteral("••••••••"), container);
-    maskedLabel->setObjectName(QStringLiteral("passwordValueLabel"));
-    maskedLabel->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    QLabel *valueLabel = new QLabel(text, container);
+    valueLabel->setObjectName(labelObjectName);
+    valueLabel->setAttribute(Qt::WA_TransparentForMouseEvents, true);
     QToolButton *copyButton = new QToolButton(container);
     copyButton->setText(QStringLiteral("复制"));
     copyButton->setAutoRaise(true);
 
-    layout->addWidget(maskedLabel, 1);
+    layout->addWidget(valueLabel, 1);
     layout->addWidget(copyButton, 0);
-    m_passwordValueLabel = maskedLabel;
-    connect(copyButton, &QToolButton::clicked, this, [this] {
-        copyCurrentPassword();
-    });
 
-    ui->tableDetails->setCellWidget(m_passwordRow, 1, container);
-    ui->tableDetails->resizeRowToContents(m_passwordRow);
+    if (labelOut != nullptr) {
+        *labelOut = valueLabel;
+    }
+    if (buttonOut != nullptr) {
+        *buttonOut = copyButton;
+    }
+    return container;
+}
+
+void MainWindow::setupCopyCells(const mempass::Account &account)
+{
+    struct CellSpec {
+        int row;
+        QString text;
+        QString objectName;
+        QString statusMessage;
+    };
+
+    const CellSpec cells[] = {
+        {kUsernameRow,
+         account.username,
+         QStringLiteral("copyUsernameLabel"),
+         QStringLiteral("账户名已复制到剪贴板")},
+        {kDescriptionRow,
+         account.description,
+         QStringLiteral("copyDescriptionLabel"),
+         QStringLiteral("描述已复制到剪贴板")},
+        {kNoteRow,
+         account.note,
+         QStringLiteral("copyNoteLabel"),
+         QStringLiteral("备注已复制到剪贴板")},
+    };
+
+    for (const CellSpec &cell : cells) {
+        QToolButton *copyButton = nullptr;
+        QWidget *container = buildValueCell(cell.text, cell.objectName, nullptr, &copyButton);
+        copyButton->setEnabled(!cell.text.isEmpty());
+        connect(copyButton, &QToolButton::clicked, this, [this, cell] {
+            if (cell.text.isEmpty()) {
+                return;
+            }
+            QGuiApplication::clipboard()->setText(cell.text);
+            statusBar()->showMessage(cell.statusMessage, 5000);
+        });
+
+        ui->tableDetails->setCellWidget(cell.row, 1, container);
+        ui->tableDetails->resizeRowToContents(cell.row);
+    }
+}
+
+void MainWindow::clearCopyCells()
+{
+    const int rows[] = {kUsernameRow, kDescriptionRow, kNoteRow};
+    for (int row : rows) {
+        if (QWidget *cellWidget = ui->tableDetails->cellWidget(row, 1)) {
+            ui->tableDetails->removeCellWidget(row, 1);
+            delete cellWidget;
+        }
+    }
 }
 
 void MainWindow::copyCurrentPassword()
@@ -534,6 +605,7 @@ void MainWindow::copyCurrentPassword()
 void MainWindow::clearDetails()
 {
     clearPasswordCell();
+    clearCopyCells();
     m_currentAccountId.clear();
     m_currentPassword.clear();
     m_passwordRow = -1;
